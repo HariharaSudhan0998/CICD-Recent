@@ -1,4 +1,4 @@
-package com.qascript;
+package hello;
 
 import org.junit.Assert;
 import org.junit.Test;
