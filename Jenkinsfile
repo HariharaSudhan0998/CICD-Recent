@@ -1,3 +1,4 @@
+  
 pipeline {
    agent any
 
@@ -19,14 +20,14 @@ pipeline {
    } 
     stage('Code Quality') {
      steps {	    	    
-         /*  withSonarQubeEnv('sonarqube') {
+           withSonarQubeEnv('sonarqube') {
 		     sh """ 		        
                         mvn sonar:sonar \
-                          -Dsonar.projectKey=sonarqube1 \
-                          -Dsonar.host.url=http://65.2.108.33:9000 \
+                        -Dsonar.projectKey=sonar \
+                        -Dsonar.host.url=http://65.2.108.33:9000 \
                          
                        """ 
-		        } */
+		        } 
         
         echo 'Code Quality...'
 	}
@@ -39,7 +40,7 @@ pipeline {
         echo 'Artifact Push...'
      }
    }
-   stage('Deploy') {
+   stage('Deploy to Test') {
 	      steps{
 		      
 		   script {
@@ -48,30 +49,27 @@ pipeline {
                 sh 'ssh -o StrictHostKeyChecking=no ec2-user@172.31.9.220 "pwd; ls -ltr; java -jar gs-spring-boot-1.0.1.jar 2>> /dev/null >> /dev/null &"; sleep 10; ps -ef |grep java'
 		   }                 
 	      } 
+		       	  
+                       echo 'Deploy to dev...'
         }
    }
-    stage('Smoke Test') {
-     steps {       			       
-	     sh 'curl http://65.2.108.33:8080'	  
+     stage('Functional Test') {
+     steps {       			       	       
+        echo 'Functional Test...'
+		     }
+   } 
+     stage('Deploy to Production') {
+     steps {	     
+				    
+        echo 'Deploy to Production...'
+     }
+   }  
+      stage('Smoke Test') {
+      steps {       		
+	     
+	    // sh 'curl http://65.2.108.33:8080'
         echo 'Smoke Test...'
 		     }
    } 
-    stage('Functional Test') {
-     steps {	     
-				    	//sh('SeleniumTest.java')	
-	                               
-				  //    step([$class : 'Publisher', reportFilenamePattern : '**/testng-results.xml'])  
-	           
-			
-        echo 'Functional Test...'
-     }
-   }
-   stage('Email Notification') {
-     steps {
-	    // mail bcc: '', body: '''Hi all,
-              //The pipeline run successfully.''', cc: '', from: '', replyTo: '', subject: 'Jenkins pipeline', to: 'hariharasudhan9894@gmail.com'
-        echo 'Email Notification...'
-     }
-   }
   }
 }
